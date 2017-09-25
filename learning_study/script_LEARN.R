@@ -4,31 +4,43 @@
 # For this analysis, you will need to install and then open the following packages:
 # install.packages("metafor"); install.packages("dplyr"); install.packages("ggplot2")
 library("plyr"); library("ggplot2"); library("lme4"); library("lmerTest");
-library("ez"); library("car"); library("dplyr")
+library("ez"); library("car"); library("dplyr"); library("RCurl")
 
 ##----------------------- Data Cleaning and QA ---------------------------------
 ## Setting the Directory -------------------------------------------------------
 getwd()
-setwd("C:/Users/u6015231/Documents/GitHub/difficulty_EEG/learning_study/")
-list.files("./data/")
+# You can either download the data files from GitHub and save them in your 
+# working directory or read the files into your working directory directly from 
+# GitHub. The code for reading in the files from GitHub is provided below.
+
 
 ## Importing Data and QA -------------------------------------------------------
 # The SCORES data file contains all of the scores and single item engagement
 # scores from practice and retention testing. 
-SCORES<-read.csv("./data/data_SCORES.csv", header = TRUE)
-head(SCORES)
+SCORES <- read.csv(text = getURL("https://raw.githubusercontent.com/keithlohse/difficulty_EEG/master/learning_study/data/data_SCORES.csv"), 
+              header = TRUE)
+# If you saved the files into your working directory, then run:
+# SCORES<-read.csv("./data_SCORES.csv", header = TRUE)
+head(SCORES) # Should be 1440 observations of 105 variables
 
 # The SURVEY data file contains the post-test data integrated with the composite 
 # scores from all of the participant surveys. Responses for single questions are 
 # not included in this file, but are included in the SURVEY_MASTER Excel file.
-SURVEY<-read.csv("./data/data_SURVEY.csv", header = TRUE)
-head(SURVEY)
+SURVEY <- read.csv(text = getURL("https://raw.githubusercontent.com/keithlohse/difficulty_EEG/master/learning_study/data/data_SURVEY.csv"), 
+                   header = TRUE)
+# If you saved the files into your working directory, then run:
+# SURVEY<-read.csv("./data_SURVEY.csv", header = TRUE)
+head(SURVEY) # Should be 60 observations of 79 variables.
 
 # The COMB data file combines the score data from the current experiment (Exp 2)
-# and from Leiker et al, HMS, 2016. These data allow us to meta-analytically 
-# test the effect of group controlling for pretest. 
-COMB<-read.csv("./data/data_SCORES_COMB_LONG.csv", header = TRUE)
-head(COMB)
+# and from Leiker, Bruzi, et al, HMS, 2016. These data allow us to meta-
+# analytically test the effect of group controlling for pretest. 
+COMB <- read.csv(text = getURL("https://raw.githubusercontent.com/keithlohse/difficulty_EEG/master/learning_study/data/data_SCORES_COMB_LONG.csv"), 
+                   header = TRUE)
+# If you saved the files into your working directory, then run:
+# COMB<-read.csv("./data/data_SCORES_COMB_LONG.csv", header = TRUE)
+head(COMB) # Should be 480 observations of 18 variables.
+# For use later, we will create a mean centered version of the pre-test variable
 COMB$pretest.c<-COMB$pretest-mean(COMB$pretest)
 
 
