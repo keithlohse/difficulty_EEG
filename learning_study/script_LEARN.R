@@ -175,9 +175,13 @@ summary(aov(post_score~diff*pretest.c+diff*group*experiment+
 # group was not statistically different between the two experiments. This 
 # pooled effect gives us the best estimate of the "true" effect of group. 
 
-# Averaging across difficulty, we can see the group effect in a linear model
-comb<-lm(post_score~1+self.c*pretest.c, data=COMB_ave)
+# Averaging across difficulty, we can see the group effect in a linear model in 
+# the different studies:
+comb<-lm(post_score~1+pretest.c+self.c, data=COMB_ave)
 summary(comb)
+summary(lm(post_score~1+pretest.c+self.c, data=COMB_ave[COMB_ave$experiment=="Leiker et al. (2016)",]))
+summary(lm(post_score~1+pretest.c+self.c, data=COMB_ave[COMB_ave$experiment=="Replication",]))
+
 plot(comb) # We can check the statistical assumptions of our regression
 
 ## Figure 2 --------------------------------------------------------------------
