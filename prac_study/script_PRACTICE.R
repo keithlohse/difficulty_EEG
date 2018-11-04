@@ -2,18 +2,18 @@
 
 # For this analysis, you will need to install and then open the following packages:
 #install.packages("dplyr"); install.packages("ggplot2")
-library("dplyr"); library("ggplot2"); library("lme4"); library("lmerTest")
+library("dplyr"); library("ggplot2"); library("lme4"); library("lmerTest");
+library("car")
 
 
 ## Part 1 ----------------------------------------------------------------------
 ## Setting the Directory -------------------------------------------------------
-# Home computer
-setwd("C:/Orion/Grad_Biostats/")
-# On KRL Computer
-setwd("C:/Users/u6015231/Box Sync/difficulty EEG study/")
-list.files("./data/")
 
-SCORES<-read.csv("./data/data_SCORES.csv", header = TRUE)
+# On KRL Computer
+setwd("C:/Users/kelop/Documents/GitHub/difficulty_EEG/prac_study")
+list.files()
+
+SCORES<-read.csv("./data_SCORES.csv", header = TRUE)
 head(SCORES)
 
 ## Selecting the Practice Data ----
@@ -27,8 +27,8 @@ summary(PRAC$phase)
 ## Contrast Coding the Group Variable ----
 PRAC$self.c<-(as.numeric(PRAC$group)-1.5)*(-1)
 head(PRAC)
-PRAC$self.c
 summary(PRAC$diff)
+summary(PRAC$diff.c) # diff.c was mean centered on 5
 summary(PRAC$scoreQ)
 PRAC$scoreQ.c<-PRAC$scoreQ-mean(PRAC$scoreQ)
 summary(PRAC$block)
@@ -110,32 +110,37 @@ t.test(meanMot~group, BY_SUB, paired=FALSE, var.equal=TRUE)
 ## Frontal Asymmetry -----------------------------------------------------------
 ## FAS as a function of block number and group ----
 # Our primary dependent variable is FAS_alpha_Drest
-F1 <- lmer(FAS_alpha_Drest~1+block+self.c+(1+block|subID), data=PRAC, REML = FALSE)
+head(PRAC)
+F1 <- lmer(delta_FAS_rest~1+block.c+self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(F1)
 
-F2 <- lmer(FAS_alpha_Drest~1+block+self.c+diff.c+(1+block|subID), data=PRAC, REML = FALSE)
+F2 <- lmer(delta_FAS_rest~1+block.c+self.c+diff.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(F2)
 
-F3 <- lmer(FAS_alpha_Drest~1+block+self.c+diff.c+scoreQ.c+(1+block|subID), data=PRAC, REML = FALSE)
+F3 <- lmer(delta_FAS_rest~1+block.c+self.c+diff.c+scoreQ.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(F3)
 
-F4 <- lmer(FAS_alpha_Drest~1+block*self.c+diff.c*self.c+
+F4 <- lmer(delta_FAS_rest~1+block.c*self.c+diff.c*self.c+
              scoreQ.c*self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(F4)
 
-F5 <- lmer(FAS_alpha_Drest~1+block*self.c+diff.c*self.c
+F5 <- lmer(delta_FAS_rest~1+block.c*self.c+diff.c*self.c
            +scoreQ.c*self.c+eng_st.c*self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(F5)
 
-F6 <- lmer(FAS_alpha_Drest~1+block*self.c+diff.c*self.c
+F6 <- lmer(delta_FAS_rest~1+block.c*self.c+diff.c*self.c
            +scoreQ.c*self.c+mot_st.c*self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(F6)
 
 anova(F1,F2,F3,F4,F5,F6)
+Anova(F2, type="III")
+
+
 
 ## Figure 3A FAS by Group, Time, and Difficulty --------------------------------
-g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = FAS_alpha_Drest)) +
-  geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) + 
+g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = delta_FAS_rest)) +
+  geom_line(aes(group=subID), col="grey80") +
+  geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) +
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
 g2<-g1+scale_x_continuous(name = "Difficulty", breaks=c(1:9)) +
@@ -150,8 +155,8 @@ g3 <- g2 + theme_bw() +
 plot(g3)
 
 group<-c("self", "yoked")
-Intercepts<-c(0.001485,-0.079565)
-Slopes<- c(-0.0197295, -0.0116105)
+Intercepts<-c(0.0166535, 0.0226125)
+Slopes<- c(-0.0067445, -0.0016735)
 dd<-data.frame(group,Intercepts,Slopes)  
 dd
 g4<- g3 + geom_abline(aes(intercept=Intercepts, slope=Slopes, lty=group), lwd=2, data=dd)
@@ -164,35 +169,37 @@ plot(g4)
 ## Midline Frontal Theta -------------------------------------------------------
 # MF Theta as a function of block number and group ----
 # Our primary dependent variable is MF_theta_Drest
-T1 <- lmer(MF_theta_Drest~1+block.c+self.c+(1+block|subID), data=PRAC, REML = FALSE)
+head(PRAC)
+T1 <- lmer(delta_MFT_rest~1+block.c+self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(T1)
 
-T2 <- lmer(MF_theta_Drest~1+block.c+self.c+diff.c+(1+block|subID), data=PRAC, REML = FALSE)
+T2 <- lmer(delta_MFT_rest~1+block.c+self.c+diff.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(T2)
 
-T3 <- lmer(MF_theta_Drest~1+block.c+self.c+diff.c+scoreQ.c+(1+block|subID), data=PRAC, REML = FALSE)
+T3 <- lmer(delta_MFT_rest~1+block.c+self.c+diff.c+scoreQ.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(T3) 
 
-T4 <- lmer(MF_theta_Drest~1+block.c*self.c+diff.c*self.c+
+T4 <- lmer(delta_MFT_rest~1+block.c*self.c+diff.c*self.c+
              scoreQ.c*self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(T4) 
 
-T5 <- lmer(MF_theta_Drest~1+block.c*self.c+diff.c*self.c+
+T5 <- lmer(delta_MFT_rest~1+block.c*self.c+diff.c*self.c+
              scoreQ.c*self.c+eng_st.c*self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(T5)
 
-T6 <- lmer(MF_theta_Drest~1+block.c*self.c+diff.c*self.c+
+T6 <- lmer(delta_MFT_rest~1+block.c*self.c+diff.c*self.c+
              scoreQ.c*self.c+mot_st.c*self.c+(1+block|subID), data=PRAC, REML = FALSE)
 summary(T6)
 
 anova(T1,T2,T3,T4,T5,T6)
 
 ## Figure 4A MFT by Group, and Time --------------------------------------------
-g1<-ggplot(PRAC, aes(x = jitter(block, factor=0.5), y = MF_theta_Drest)) +
+g1<-ggplot(PRAC, aes(x = jitter(block, factor=0.5), y = delta_MFT_rest)) +
+  stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
   geom_point(aes(fill=diff), pch=21, size=3, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
-g2<-g1+scale_x_continuous(name = "Block", limits=c(0,20)) +
+g2<-g1+scale_x_continuous(name = "Block") +
   scale_y_continuous(name = expression(Delta* "MFT"))
 g3 <- g2 + theme_bw() + 
   theme(axis.text=element_text(size=16, colour="black"), 
@@ -205,8 +212,8 @@ plot(g3)
 
 # Fixed Effect of Block
 group<-c("self", "yoked")
-Intercepts<-c(0.0302, 0.04538)
-Slopes<- c(-0.00303, -0.00394)
+Intercepts<-c(0.252038, 0.204648)
+Slopes<- c(0.0028887, -0.0027173)
 dd<-data.frame(group,Intercepts,Slopes)  
 dd
 g4<- g3 + geom_abline(aes(intercept=Intercepts, slope=Slopes, lty=group), lwd=2, data=dd)
@@ -214,7 +221,8 @@ g4<- g3 + geom_abline(aes(intercept=Intercepts, slope=Slopes, lty=group), lwd=2,
 print(g4)
 
 ## Figure 4B MFT by Group, Time, and Difficulty --------------------------------
-g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = MF_theta_Drest)) +
+g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = delta_MFT_rest)) +
+  stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
   geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
@@ -232,8 +240,8 @@ plot(g3)
 
 # Fixed Effect of Difficulty
 group<-c("self", "yoked")
-Intercepts<-c(0.00302, 0.04538)
-Slopes<- c(0.01425, 0.01351)
+Intercepts<-c(0.1996950, 0.152305)
+Slopes<- c(0.00306, 0.0182200)
 dd<-data.frame(group,Intercepts,Slopes)  
 dd
 g4<- g3 + geom_abline(aes(intercept=Intercepts, slope=Slopes, lty=group), lwd=2, data=dd)
@@ -241,7 +249,8 @@ g4<- g3 + geom_abline(aes(intercept=Intercepts, slope=Slopes, lty=group), lwd=2,
 plot(g4)
 
 ## Figure 4C MFT by Group, Difficulty, and Score--------------------------------
-g1<-ggplot(PRAC, aes(x = jitter(scoreQ, factor=0.5), y = MF_theta_Drest)) +
+g1<-ggplot(PRAC, aes(x = jitter(scoreQ, factor=0.5), y = delta_MFT_rest)) +
+  stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
   geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
@@ -257,10 +266,12 @@ g3 <- g2 + theme_bw() +
 
 plot(g3)
 
+summary(PRAC$scoreQ)
+
 # Fixed Effect of Score
 group<-c("self", "yoked")
-Intercepts<-c(0.0302, 0.04538)
-Slopes<- c(-0.00235, -0.00447)
+Intercepts<-c(0.283325, 0.235935)
+Slopes<- c(-0.0043560, -0.0017300)
 dd<-data.frame(group,Intercepts,Slopes)  
 dd
 g4<- g3 + geom_abline(aes(intercept=Intercepts, slope=Slopes, lty=group), lwd=2, data=dd)
@@ -434,10 +445,10 @@ plot(g2)
 # Supplemental Figures
 head(PRAC)
 ## FAS reliability within participants -----------------------------------------
-g1<-ggplot(PRAC, aes(x = subID, y = FAS_alpha)) +
+g1<-ggplot(PRAC, aes(x = subID, y = FAS)) +
   geom_boxplot(aes(fill=as.factor(subID)), alpha = .8, notch=FALSE, 
                 col="black", lwd=1, outlier.shape=NA)+
-  facet_wrap(~group, scales="free")+
+  facet_wrap(~group, scales="free", nrow=2)+
   scale_x_discrete(name = "Subject") +
   scale_y_continuous(name = "Raw FAS")
 g2 <- g1 + theme_bw() + 
@@ -450,10 +461,10 @@ g2 <- g1 + theme_bw() +
 plot(g2)
 
 ## Delta FAS reliabilty within participants ------------------------------------
-g1<-ggplot(PRAC, aes(x = subID, y = FAS_alpha_Drest)) +
+g1<-ggplot(PRAC, aes(x = subID, y = delta_FAS_rest)) +
   geom_boxplot(aes(fill=as.factor(subID)), alpha = .8, notch=FALSE, 
                col="black", lwd=1, outlier.shape=NA)+
-  facet_wrap(~group, scales="free")+
+  facet_wrap(~group, scales="free", nrow=2)+
   scale_x_discrete(name = "Subject") +
   scale_y_continuous(name = expression(Delta* "FAS"))
 g2 <- g1 + theme_bw() + 
@@ -468,10 +479,10 @@ plot(g2)
 
 
 ## MFT reliability within participants -----------------------------------------
-g1<-ggplot(PRAC, aes(x = subID, y = ln_Fz_theta)) +
+g1<-ggplot(PRAC, aes(x = subID, y = MFT)) +
   geom_boxplot(aes(fill=as.factor(subID)), alpha = .8, notch=FALSE, 
                col="black", lwd=1, outlier.shape=NA)+
-  facet_wrap(~group, scales="free")+
+  facet_wrap(~group, scales="free", nrow=2)+
   scale_x_discrete(name = "Subject") +
   scale_y_continuous(name = "Raw MFT")
 g2 <- g1 + theme_bw() + 
@@ -485,10 +496,10 @@ plot(g2)
 
 
 ## Delta MFT reliability within participants -----------------------------------------
-g1<-ggplot(PRAC, aes(x = subID, y = MF_theta_Drest)) +
+g1<-ggplot(PRAC, aes(x = subID, y = delta_MFT_rest)) +
   geom_boxplot(aes(fill=as.factor(subID)), alpha = .8, notch=FALSE, 
                col="black", lwd=1, outlier.shape=NA)+
-  facet_wrap(~group, scales="free")+
+  facet_wrap(~group, scales="free", nrow=2)+
   scale_x_discrete(name = "Subject") +
   scale_y_continuous(name = expression(Delta* "MFT"))
 g2 <- g1 + theme_bw() + 
