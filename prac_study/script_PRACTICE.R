@@ -10,7 +10,7 @@ library("car")
 ## Setting the Directory -------------------------------------------------------
 
 # On KRL Computer
-setwd("C:/Users/kelop/Documents/GitHub/difficulty_EEG/prac_study")
+setwd("C:/Users/u6015231/Documents/GitHub/difficulty_EEG/prac_study")
 list.files()
 
 SCORES<-read.csv("./data_SCORES.csv", header = TRUE)
@@ -106,6 +106,44 @@ aggregate(meanMot ~ group, BY_SUB, sd)
 t.test(meanMot~group, BY_SUB, paired=FALSE, var.equal=TRUE)
 
 
+## Power Spectral Density for Fz -----------------------------------------------
+EEG<-read.csv("./data_EEG_MASTER.csv", header = TRUE)
+
+EEG2<-EEG %>% 
+  group_by_(.dots=c("subID","Hz")) %>% 
+  summarize(
+    Group=group[1],
+    Fz=mean(Fz, na.rm=TRUE))
+head(EEG2)
+EEG2<-subset(EEG2, Hz>=1)
+EEG2<-subset(EEG2, Hz<=20)
+head(EEG2)
+
+EEG3<-EEG2 %>% 
+  group_by_(.dots=c("Group","Hz")) %>% 
+  summarize(
+    mFz=mean(Fz, na.rm=TRUE))
+
+summary(EEG3$Group)
+
+g1<-ggplot(EEG2, aes(x = Hz, y = Fz)) +
+  geom_line(aes(group=subID), col="grey80") +
+  #stat_smooth(aes(group=Group, lty=Group), col="black", method="loess", size=1, lwd=1.5)+
+  facet_wrap(~Group, ncol=2)
+g2<-g1+scale_x_continuous(name = "Frequency (Hz)", limits=c(0,20)) +
+  scale_y_continuous(name = expression("Power " (mu* "V^2")))
+g3 <- g2 + theme_bw() + 
+  theme(axis.text=element_text(size=20, colour="black"), 
+        axis.title=element_text(size=20,face="bold"),
+        plot.title=element_text(size=20,face="bold", hjust = 0.5)) +
+  theme(strip.text.x = element_text(size = 20))+
+  theme(legend.position="none")
+plot(g3)
+
+g4<- g3 + geom_line(aes(x=Hz, y=mFz, lty=Group), 
+                      lwd=1.5, data=EEG3)
+
+plot(g4)
 
 ## Frontal Asymmetry -----------------------------------------------------------
 ## FAS as a function of block number and group ----
@@ -139,7 +177,7 @@ Anova(F2, type="III")
 
 ## Figure 3A FAS by Group, Time, and Difficulty --------------------------------
 g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = delta_FAS_rest)) +
-  geom_line(aes(group=subID), col="grey80") +
+  stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
   geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) +
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
@@ -199,7 +237,7 @@ g1<-ggplot(PRAC, aes(x = jitter(block, factor=0.5), y = delta_MFT_rest)) +
   geom_point(aes(fill=diff), pch=21, size=3, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
-g2<-g1+scale_x_continuous(name = "Block") +
+g2<-g1+scale_x_continuous(name = "Block", limits=c(0,20)) +
   scale_y_continuous(name = expression(Delta* "MFT"))
 g3 <- g2 + theme_bw() + 
   theme(axis.text=element_text(size=16, colour="black"), 
