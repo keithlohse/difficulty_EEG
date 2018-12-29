@@ -178,7 +178,7 @@ Anova(F2, type="III")
 ## Figure 3A FAS by Group, Time, and Difficulty --------------------------------
 g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = delta_FAS_rest)) +
   stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
-  geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) +
+  geom_point(aes(fill=block), pch=21, size=2, stroke=1, alpha = .5) +
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
 g2<-g1+scale_x_continuous(name = "Difficulty", breaks=c(1:9)) +
@@ -234,7 +234,7 @@ anova(T1,T2,T3,T4,T5,T6)
 ## Figure 4A MFT by Group, and Time --------------------------------------------
 g1<-ggplot(PRAC, aes(x = jitter(block, factor=0.5), y = delta_MFT_rest)) +
   stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
-  geom_point(aes(fill=diff), pch=21, size=3, stroke=1, alpha = .5) + 
+  geom_point(aes(fill=diff), pch=21, size=2, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
 g2<-g1+scale_x_continuous(name = "Block", limits=c(0,20)) +
@@ -261,7 +261,7 @@ print(g4)
 ## Figure 4B MFT by Group, Time, and Difficulty --------------------------------
 g1<-ggplot(PRAC, aes(x = jitter(diff, factor=0.5), y = delta_MFT_rest)) +
   stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
-  geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) + 
+  geom_point(aes(fill=block), pch=21, size=2, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
 g2<-g1+scale_x_continuous(name = "Difficulty", breaks=c(1:9)) +
@@ -289,7 +289,7 @@ plot(g4)
 ## Figure 4C MFT by Group, Difficulty, and Score--------------------------------
 g1<-ggplot(PRAC, aes(x = jitter(scoreQ, factor=0.5), y = delta_MFT_rest)) +
   stat_smooth(aes(group=subID), col="grey80", method="lm", se=FALSE) +
-  geom_point(aes(fill=block), pch=21, size=3, stroke=1, alpha = .5) + 
+  geom_point(aes(fill=block), pch=21, size=2, stroke=1, alpha = .5) + 
   scale_fill_gradient(low="white", high="black")+
   facet_wrap(~group, ncol=2)
 g2<-g1+scale_x_continuous(name = "Ranked Score", limits=c(0,20)) +
@@ -357,11 +357,11 @@ g1<-ggplot(PRAC, aes(x = will_inc, y = scoreQ)) +
               pch=21, size=2, alpha = .5) + 
   geom_boxplot(aes(fill=as.factor(will_inc)), alpha = .8, notch=FALSE, 
               col="black", lwd=1, outlier.shape=NA, width=0.5)+
-  scale_fill_manual(name="Increase Difficulty",
+  scale_fill_manual(name="Increased Difficulty",
                     breaks=c("0", "1"),
                     values = c("grey20", "white"))+  
   facet_wrap(~group)+
-  scale_x_continuous(name = "Increase Difficulty on Next Block", breaks=c(0,1)) +
+  scale_x_continuous(name = "Increased Difficulty on Next Block", breaks=c(0,1)) +
   scale_y_continuous(name = "Ranked Score", limits=c(0,20))
 g2 <- g1 + theme_bw() + 
   theme(axis.text=element_text(size=16, colour="black"), 
@@ -378,11 +378,11 @@ g1<-ggplot(PRAC, aes(x = will_inc, y = eng_st)) +
               pch=21, size=2, alpha = .5) + 
   geom_boxplot(aes(fill=as.factor(will_inc)), alpha = .8, notch=FALSE, 
                col="black", lwd=1, outlier.shape=NA, width=0.5)+
-  scale_fill_manual(name="Increase Difficulty",
+  scale_fill_manual(name="Increased Difficulty",
                     breaks=c("0", "1"),
                     values = c("grey20", "white"))+  
   facet_wrap(~group)+
-  scale_x_continuous(name = "Increase Difficulty on Next Block", breaks=c(0,1)) +
+  scale_x_continuous(name = "Increased Difficulty on Next Block", breaks=c(0,1)) +
   scale_y_continuous(name = "Single-Item Engagement", limits=c(0,10), breaks=c(0:10))
 g2 <- g1 + theme_bw() + 
   theme(axis.text=element_text(size=16, colour="black"), 
@@ -433,11 +433,11 @@ g1<-ggplot(PRAC, aes(x = will_dec, y = scoreQ)) +
               pch=21, size=2, alpha = .5) + 
   geom_boxplot(aes(fill=as.factor(will_dec)), alpha = .8, notch=FALSE, 
                col="black", lwd=1, outlier.shape=NA, width=0.5)+
-  scale_fill_manual(name="Decrease Difficulty",
+  scale_fill_manual(name="Decreased Difficulty",
                     breaks=c("0", "1"),
                     values = c("grey20", "white"))+  
   facet_wrap(~group)+
-  scale_x_continuous(name = "Decrease Difficulty on Next Block", breaks=c(0,1)) +
+  scale_x_continuous(name = "Decreased Difficulty on Next Block", breaks=c(0,1)) +
   scale_y_continuous(name = "Ranked Score", limits=c(0,20))
 g2 <- g1 + theme_bw() + 
   theme(axis.text=element_text(size=16, colour="black"), 
@@ -454,11 +454,11 @@ g1<-ggplot(PRAC, aes(x = will_dec, y = eng_st)) +
               pch=21, size=2, alpha = .5) + 
   geom_boxplot(aes(fill=as.factor(will_dec)), alpha = .8, notch=FALSE, 
                col="black", lwd=1, outlier.shape=NA, width=0.5)+
-  scale_fill_manual(name="Decrease Difficulty",
+  scale_fill_manual(name="Decreased Difficulty",
                     breaks=c("0", "1"),
                     values = c("grey20", "white"))+  
   facet_wrap(~group)+
-  scale_x_continuous(name = "Decrease Difficulty on Next Block", breaks=c(0,1)) +
+  scale_x_continuous(name = "Decreased Difficulty on Next Block", breaks=c(0,1)) +
   scale_y_continuous(name = "Single-Item Engagement", limits=c(0,10), breaks=c(0:10))
 g2 <- g1 + theme_bw() + 
   theme(axis.text=element_text(size=16, colour="black"), 
